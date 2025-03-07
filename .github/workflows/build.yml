@@ -1,4 +1,4 @@
-name: Build React Native Application
+name: Build and Test React Native Application
 
 on:
   push:
@@ -11,6 +11,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      metro:
+        image: mcr.microsoft.com/playwright:latest
+        ports:
+          - 8081:8081
+        options: >-
+          --health-cmd="curl --fail http://localhost:8081/status || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout repository
@@ -28,11 +39,15 @@ jobs:
       - name: Start Metro
         run: |
           yarn start &
-
+      
       - name: Build Android
         run: |
           yarn android
 
       - name: Build iOS
         run: |
+          sudo gem install cocoapods
+          cd ios
+          pod install
+          cd ..
           yarn ios
