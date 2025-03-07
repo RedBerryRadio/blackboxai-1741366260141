@@ -1,0 +1,38 @@
+name: Build React Native Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: |
+          yarn install
+
+      - name: Start Metro
+        run: |
+          yarn start &
+
+      - name: Build Android
+        run: |
+          yarn android
+
+      - name: Build iOS
+        run: |
+          yarn ios
